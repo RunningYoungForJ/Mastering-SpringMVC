@@ -1,9 +1,11 @@
 package masterSpringMvc.chapter3.dto;
 
+import masterSpringMvc.chapter3.date.PastLocalDate;
 import org.hibernate.validator.constraints.Email;
 import org.hibernate.validator.constraints.NotEmpty;
 
 import javax.validation.constraints.NotNull;
+import javax.validation.constraints.Past;
 import javax.validation.constraints.Size;
 import java.time.LocalDate;
 import java.util.ArrayList;
@@ -13,15 +15,16 @@ import java.util.List;
  * Created by yangkun on 2018/3/12.
  */
 public class ProfileForm {
-    @Size(min = 2)
+    @Size(min = 2,max = 64)
     private String twitterHandler;
     @Email
     @NotEmpty
     private String email;
     @NotNull
+    @PastLocalDate
     private LocalDate birthDate;
 
-    private List<String> tasts=new ArrayList<>();
+    private List<String> tastes=new ArrayList<>();
 
     public String getTwitterHandler() {
         return twitterHandler;
@@ -47,12 +50,12 @@ public class ProfileForm {
         this.birthDate = birthDate;
     }
 
-    public List<String> getTasts() {
-        return tasts;
+    public List<String> getTastes() {
+        return tastes;
     }
 
-    public void setTasts(List<String> tasts) {
-        this.tasts = tasts;
+    public void setTastes(List<String> tastes) {
+        this.tastes = tastes;
     }
 
     @Override
@@ -61,7 +64,7 @@ public class ProfileForm {
                 "twitterHandler='" + twitterHandler + '\'' +
                 ", email='" + email + '\'' +
                 ", birthDate=" + birthDate +
-                ", tasts=" + tasts +
+                ", tasts=" + tastes +
                 '}';
     }
 }
