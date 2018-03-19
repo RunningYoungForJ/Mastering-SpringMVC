@@ -3,6 +3,7 @@ package masterSpringMvc.chapter4.controller;
 import masterSpringMvc.chapter2.config.PictureUploadProperties;
 import org.apache.tomcat.util.http.fileupload.IOUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.MessageSource;
 import org.springframework.core.io.FileSystemResource;
 import org.springframework.core.io.Resource;
 import org.springframework.stereotype.Controller;
@@ -17,6 +18,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.*;
 import java.net.URLConnection;
+import java.util.Locale;
 
 /**
  * Created by yangkun on 2018/3/15.
@@ -26,11 +28,13 @@ import java.net.URLConnection;
 public class PictureUploadController {
     private final Resource pictureDir;
     private final Resource anonymousPicture;
+    private final MessageSource messageSource;
 
     @Autowired
-    public PictureUploadController(PictureUploadProperties properties) {
+    public PictureUploadController(PictureUploadProperties properties,MessageSource messageSource) {
         this.pictureDir = properties.getUploadPath();
         this.anonymousPicture = properties.getAnonymousPicture();
+        this.messageSource=messageSource;
     }
 
     @RequestMapping("upload")
@@ -57,9 +61,9 @@ public class PictureUploadController {
     }
 
     @RequestMapping(value = "/uploadError")
-    public ModelAndView onUploadError(HttpServletRequest request){
+    public ModelAndView onUploadError(Locale locale){
         ModelAndView modelAndView=new ModelAndView("profile/uploadPage");
-        modelAndView.addObject("error",request.getAttribute(WebUtils.ERROR_MESSAGE_ATTRIBUTE));
+        modelAndView.addObject("error",messageSource.getMessage("upload.file.too.big",null,locale));
         return modelAndView;
     }
 
@@ -80,9 +84,9 @@ public class PictureUploadController {
     }
 
     @ExceptionHandler(value ={IOException.class} )
-    public ModelAndView handleException(IOException exception){
+    public ModelAndView handleException(Locale locale){
         ModelAndView modelAndView=new ModelAndView("profile/uploadPage");
-        modelAndView.addObject("error",exception.getMessage());
+        modelAndView.addObject("error",messageSource.getMessage("upload.io.exception",null,locale));
         return modelAndView;
     }
 

@@ -87,4 +87,14 @@
 
 19. ClassPathResource（P93）
 
-14. URLConnection（p93）
+20. URLConnection（p93）
+
+21. @ExceptionHandler（p99）
+
+22. EmbeddedServletContainerCustomizer（p100）
+
+23. MessageSource（p102）
+
+24. HTTP会话
+
+25. @Scope（p104）
