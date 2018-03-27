@@ -1,6 +1,7 @@
 package masterSpringMvc.chapter4.controller;
 
 import masterSpringMvc.chapter2.config.PictureUploadProperties;
+import masterSpringMvc.chapter4.profile.UserProfileSession;
 import org.apache.tomcat.util.http.fileupload.IOUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.MessageSource;
@@ -24,47 +25,46 @@ import java.util.Locale;
  * Created by yangkun on 2018/3/15.
  */
 @Controller
-@SessionAttributes("picturePath")
 public class PictureUploadController {
     private final Resource pictureDir;
     private final Resource anonymousPicture;
     private final MessageSource messageSource;
+    private final UserProfileSession userProfileSession;
 
     @Autowired
-    public PictureUploadController(PictureUploadProperties properties,MessageSource messageSource) {
+    public PictureUploadController(PictureUploadProperties properties,MessageSource messageSource,UserProfileSession userProfileSession) {
         this.pictureDir = properties.getUploadPath();
         this.anonymousPicture = properties.getAnonymousPicture();
         this.messageSource=messageSource;
-    }
-
-    @RequestMapping("upload")
-    public String uploadPage(){
-        return "profile/uploadPage";
-    }
-
-    @RequestMapping(value = "/upload",method = RequestMethod.POST)
-    public String onUpload(MultipartFile file, RedirectAttributes redirectAttributes, Model model) throws IOException{
-        throw new IOException("this is a exception message");
-        /*if (file.isEmpty()||!isImage(file)){
-            redirectAttributes.addFlashAttribute("error","Incorrect file. Please upload a picture");
-            return "redirect:/upload";
-        }
-        Resource picturePath = copyFileToPictures(file);
-        model.addAttribute("picturePath",picturePath);
-        return "profile/uploadPage";*/
+        this.userProfileSession=userProfileSession;
     }
 
     @RequestMapping(value = "/uploadedPicture")
-    public void getUploadedPicture(HttpServletResponse response, @ModelAttribute("picturePath") Resource picturePath) throws IOException{
+    public void getUploadedPicture(HttpServletResponse response) throws IOException{
+        Resource picturePath=userProfileSession.getPicturePath();
+        if (picturePath==null){
+            picturePath=anonymousPicture;
+        }
         response.setHeader("Content-Type", URLConnection.guessContentTypeFromName(picturePath.getFilename()));
         IOUtils.copy(picturePath.getInputStream(),response.getOutputStream());
     }
 
-    @RequestMapping(value = "/uploadError")
-    public ModelAndView onUploadError(Locale locale){
-        ModelAndView modelAndView=new ModelAndView("profile/uploadPage");
-        modelAndView.addObject("error",messageSource.getMessage("upload.file.too.big",null,locale));
-        return modelAndView;
+    /*
+    * redirect：A logical view name such as redirect:/myapp/some/resource
+    * will redirect relative to the current Servlet context,
+    * while a name such as redirect:http://myhost.com/some/arbitrary/path will redirect to an absolute URL.
+    * 在下面的redirect中，当前Servlet上下文的根路径是http://localhost:8080
+    * 因此，redirect：/profile将会重定位到localhost：8080/profile这个URL
+    * */
+    @RequestMapping(value = "/profile",method = RequestMethod.POST,params = {"upload"})
+    public String onUpload(MultipartFile file, RedirectAttributes redirectAttributes, Model model) throws IOException{
+        if (file.isEmpty()||!isImage(file)){
+            redirectAttributes.addFlashAttribute("error","Incorrect file. Please upload a picture");
+            return "redirect:/profile";//localhost:8080/profile
+        }
+        Resource picturePath = copyFileToPictures(file);
+        userProfileSession.setPicturePath(picturePath.getURL());
+        return "redirect:/profile";//localhost:8080/profile
     }
 
     private Resource copyFileToPictures(MultipartFile file) throws IOException{
@@ -78,15 +78,17 @@ public class PictureUploadController {
         return new FileSystemResource(tempFile);
     }
 
-    @ModelAttribute("picturePath")
-    public Resource picturePath(){
-        return anonymousPicture;
-    }
-
     @ExceptionHandler(value ={IOException.class} )
     public ModelAndView handleException(Locale locale){
         ModelAndView modelAndView=new ModelAndView("profile/uploadPage");
         modelAndView.addObject("error",messageSource.getMessage("upload.io.exception",null,locale));
+        return modelAndView;
+    }
+
+    @RequestMapping(value = "/uploadError")
+    public ModelAndView onUploadError(Locale locale){
+        ModelAndView modelAndView=new ModelAndView("profile/uploadPage");
+        modelAndView.addObject("error",messageSource.getMessage("upload.file.too.big",null,locale));
         return modelAndView;
     }
 

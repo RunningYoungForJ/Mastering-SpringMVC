@@ -3,9 +3,12 @@ package masterSpringMvc.chapter4.profile;
 import masterSpringMvc.chapter3.dto.ProfileForm;
 import org.springframework.context.annotation.Scope;
 import org.springframework.context.annotation.ScopedProxyMode;
+import org.springframework.core.io.Resource;
+import org.springframework.core.io.UrlResource;
 import org.springframework.stereotype.Component;
 
 import java.io.Serializable;
+import java.net.URL;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
@@ -20,6 +23,7 @@ public class UserProfileSession implements Serializable {
     private String email;
     private LocalDate birthDate;
     private List<String> tastes=new ArrayList<>();
+    private URL picturePath;
 
     public void setForm(ProfileForm profileForm){
         this.twitterHandler=profileForm.getTwitterHandler();
@@ -35,5 +39,21 @@ public class UserProfileSession implements Serializable {
         profileForm.setBirthDate(this.birthDate);
         profileForm.setTastes(tastes);
         return profileForm;
+    }
+
+    public List<String> getTastes() {
+        return tastes;
+    }
+
+    public void setTastes(List<String> tastes) {
+        this.tastes = tastes;
+    }
+
+    public Resource getPicturePath() {
+        return picturePath==null?null:new UrlResource(picturePath);
+    }
+
+    public void setPicturePath(URL picturePath) {
+        this.picturePath = picturePath;
     }
 }

@@ -44,8 +44,7 @@ public class ProfileController {
             return "profile/profilePage";
         }
         userProfileSession.setForm(profileForm);
-        System.out.println("save ok "+" "+profileForm.toString());
-        return "redirect:/profile";
+        return "redirect:/search/mixed;keywords=" +String.join(",",profileForm.getTastes());
     }
 
     @ModelAttribute("dateFormat")
