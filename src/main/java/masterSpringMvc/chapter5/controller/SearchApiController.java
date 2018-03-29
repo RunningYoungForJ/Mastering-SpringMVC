@@ -15,7 +15,6 @@ import java.util.List;
  */
 @RestController
 @RequestMapping(value = "/api/search")
-@Secured("ROLE_ADMIN")
 public class SearchApiController {
     @Autowired
     private SearchService searchService;
