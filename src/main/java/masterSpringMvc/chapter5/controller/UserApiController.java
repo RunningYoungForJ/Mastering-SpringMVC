@@ -3,6 +3,7 @@ package masterSpringMvc.chapter5.controller;
 import masterSpringMvc.chapter5.Repository.UserRepository;
 import masterSpringMvc.chapter5.entity.User;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.access.annotation.Secured;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -12,6 +13,7 @@ import java.util.List;
  */
 @RestController
 @RequestMapping(value = "/api")
+@Secured("ROLE_ADMIN")
 public class UserApiController {
     @Autowired
     private UserRepository userRepository;

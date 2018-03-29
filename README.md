@@ -180,6 +180,12 @@
 
 ### Service
 
+### Config 
+
+1. @EnableGlobalMethodSecurity（p153）
+2. WebSecurityConfigurerAdapter（p153）
+3. @Order（p158）
+
 ### Entity
 
 ### AOP
